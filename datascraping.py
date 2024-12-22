@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Load the CSV file
 file_path = 'C:/Users/azama/aliinfotheory/not me/krisha.csv'
 real_estate_data = pd.read_csv(file_path)
 
@@ -10,10 +11,14 @@ real_estate_data['construction_year'] = pd.to_numeric(real_estate_data['construc
 real_estate_data = real_estate_data.dropna(subset=['price', 'construction_year'])
 real_estate_data = real_estate_data[real_estate_data['price'] > 0]
 
-# Price Distribution
+# Apply a maximum price limit
+price_limit = 200_000_000  # 200 million KZT
+filtered_data = real_estate_data[real_estate_data['price'] <= price_limit]
+
+# Price Distribution with filtering
 plt.figure(figsize=(10, 6))
-plt.hist(real_estate_data['price'], bins=50, color='skyblue', edgecolor='black', alpha=0.8)
-plt.title('Price Distribution', fontsize=16)
+plt.hist(filtered_data['price'], bins=50, color='skyblue', edgecolor='black', alpha=0.8)
+plt.title('Price Distribution (Filtered)', fontsize=16)
 plt.xlabel('Price (Millions KZT)', fontsize=14)
 plt.ylabel('Frequency', fontsize=14)
 plt.gca().xaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x / 1e6:.1f}M'))
@@ -22,7 +27,7 @@ plt.tight_layout()
 plt.show()
 
 # Average price and listing counts
-neighborhood_analysis = real_estate_data.groupby('district')['price'].agg(['mean', 'count']).sort_values(by='mean', ascending=False)
+neighborhood_analysis = filtered_data.groupby('district')['price'].agg(['mean', 'count']).sort_values(by='mean', ascending=False)
 
 # Top 10 neighborhoods by average price
 top_neighborhoods = neighborhood_analysis.head(10)
@@ -40,7 +45,7 @@ plt.tight_layout()
 plt.show()
 
 # Price trends over construction years
-price_trend = real_estate_data.groupby('construction_year')['price'].mean()
+price_trend = filtered_data.groupby('construction_year')['price'].mean()
 
 # Plot price trend over construction years
 plt.figure(figsize=(12, 6))
